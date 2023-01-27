@@ -11,10 +11,8 @@ public class Main {
         double tmp = amountOfMoney + voucher.Receivables;
         if (tmp <= voucher.CreditLimit) {
             return true;
-        } else if (tmp > voucher.CreditLimit) {
-            voucher.Cs = false;
-            return false;
         } else {
+            voucher.Cs = false;
             return false;
         }
     }
@@ -43,9 +41,6 @@ public class Main {
         voucher_sample.Cbf = false;
         voucher_sample.Cs = true;
         voucher_sample.Receivables = 0;
-
-        //test2
-
         while (true) {
             try{
                 System.out.println("Sales order -> 1, Raise Credit Limit -> 2");
@@ -54,7 +49,7 @@ public class Main {
                     System.out.println("Please enter sales amount");
                     salesOrder(voucher_sample, scan.nextDouble());
                 } else if (tmp == 2) {
-                    voucher_sample.raiseCreditLimit(voucher_sample);
+                    voucher_sample.raiseCreditLimit(scan, voucher_sample);
                 } else{
                     errorMessageDisplay("Please enter 1 or 2.");
                 }
