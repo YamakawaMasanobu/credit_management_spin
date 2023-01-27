@@ -44,6 +44,8 @@ public class Main {
         voucher_sample.Cs = true;
         voucher_sample.Receivables = 0;
 
+        //test2
+
         while (true) {
             try{
                 System.out.println("Sales order -> 1, Raise Credit Limit -> 2");
