@@ -47,6 +47,7 @@ active proctype newStateOrderRefusalStateCheck(){
      od
 }
 
+
 active proctype creditBlockFlag(){
      do
      ::voucher_ch?voucher ->
