@@ -5,18 +5,24 @@ bool Nsors = false, Cbf = false, Cs = true;
 short Creditlimit = 1000;
 short Receivabole = 0;
 
-chan voucher_ch = [0] of {mtype};
+
+chan vouchertCC_ch = [0] of {mtype};
+chan vouchernSORS_ch = [0] of {mtype};
+chan vouchercBFchk_ch = [0] of {mtype};
+chan vouchersO_ch = [0] of {mtype};
+chan vouchercBFC_ch = [0] of {mtype};
+
 chan money_ch = [0] of {short};
 chan tCC_ch = [0] of {bool};
 chan nSORSC_ch = [0] of {bool};
 chan msg_ch = [0] of {mtype};
-chan salesorder_chan = [0] of {mtype};
+chan cSO_chan = [0] of {mtype};
 chan cBFC_chan = [0] of {bool}
 chan cBFchk_chan = [0] of {bool}
 
 active proctype temporaryCreditCheck() {
      do
-     ::   voucher_ch?voucher ->
+     ::   vouchertCC_ch?voucher ->
           do
           ::   tCC_ch!true;
                break;
@@ -37,7 +43,7 @@ active proctype errorMessageDisplay(){
 
 active proctype newStateOrderRefusalStateCheck(){
      do
-     ::   voucher_ch?voucher ->
+     ::   vouchernSORS_ch?voucher ->
           do
           ::   nSORSC_ch!true;
                break;
@@ -48,9 +54,9 @@ active proctype newStateOrderRefusalStateCheck(){
 }
 
 
-active proctype creditBlockFlag(){
+active proctype creditBlockFlagCheck(){
      do
-     ::voucher_ch?voucher ->
+     ::vouchercBFchk_ch?voucher ->
           if
           ::   cBFchk_chan!true
           ::   cBFchk_chan!false
@@ -60,15 +66,15 @@ active proctype creditBlockFlag(){
 
 active proctype salesOrder(){
      do
-     ::   voucher_ch?voucher ->
-          salesorder_chan!voucher;
+     ::   vouchersO_ch?voucher ->
+          cSO_chan!voucher;
           break;
      od
 }
 
 active proctype creditBlockFlagChange(){
      do
-     ::   voucher_ch?voucher ->
+     ::   vouchercBFC_ch?voucher ->
           if
           ::   cBFC_chan?true -> Cbf = true;
           ::   cBFC_chan?false -> Cbf = false;
@@ -78,22 +84,31 @@ active proctype creditBlockFlagChange(){
 
 active proctype createSalesOrder(){
      do
-     ::   nSORSC_ch?true ->
-          msg_ch!msg;
-     ::   nSORSC_ch?false ->
-          voucher_ch!voucher
+     ::   cSO_chan?voucher ->
           if
-          ::   tCC_ch?false ->
+          ::   nSORSC_ch?true ->
                msg_ch!msg;
-               cBFC_chan!true;
-               Nsors = true;
-          ::   tCC_ch?true ->
-               voucher_ch!voucher
+          ::   nSORSC_ch?false ->
+               vouchertCC_ch!voucher
                if
-               ::   cBFchk_chan?true ->
-                    cBFC_chan!false;
+               ::   tCC_ch?false ->
+                    msg_ch!msg;
+                    cBFC_chan!true;
+                    Nsors = true;
+               ::   tCC_ch?true ->
+                    vouchercBFchk_ch!voucher
+                    if
+                    ::   cBFchk_chan?true ->
+                         cBFC_chan!false;
+                    fi;
                fi;
           fi;
+     od
+}
+
+active proctype main(){
+     do
+     ::   vouchersO_ch!voucher;
      od
 }
 
