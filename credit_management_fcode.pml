@@ -21,41 +21,36 @@ chan cBFC_chan = [0] of {bool}
 chan cBFchk_chan = [0] of {bool}
 
 active proctype temporaryCreditCheck() {
+
      do
-     ::   do
-          ::   vouchertCC_ch?voucher ->
-               do
-               ::   tCC_ch!true;
-                    break;
-               ::   Cs = false;
-                    tCC_ch!false;
-                    break;
-               od
+     ::   vouchertCC_ch?voucher ->
+          do
+          ::   tCC_ch!true;
+               break;
+          ::   Cs = false;
+               tCC_ch!false;
                break;
           od
      od
+
 }
 
 active proctype errorMessageDisplay(){
      do
-     ::   do
-          ::   msg_ch?msg ->
-               msg_ch!error_message
-               break;
-          od
+     ::   msg_ch?msg ->
+          msg_ch!error_message
      od
+
 }
 
 active proctype newStateOrderRefusalStateCheck(){
      do
-     ::   do
-          ::   vouchernSORS_ch?voucher ->
-               do
-               ::   nSORSC_ch!true;
-                    break;
-               ::   nSORSC_ch!false;
-                    break;
-               od
+     ::   vouchernSORS_ch?voucher ->
+          do
+          ::   nSORSC_ch!true;
+               break;
+          ::   nSORSC_ch!false;
+               break;
           od
      od
 }
@@ -63,64 +58,53 @@ active proctype newStateOrderRefusalStateCheck(){
 
 active proctype creditBlockFlagCheck(){
      do
-     ::   do
-          ::vouchercBFchk_ch?voucher ->
-               if
-               ::   cBFchk_chan!true
-               ::   cBFchk_chan!false
-               fi;
-               break;
-          od
+     ::vouchercBFchk_ch?voucher ->
+          if
+          ::   cBFchk_chan!true
+          ::   cBFchk_chan!false
+          fi;
      od
 }
 
 active proctype salesOrder(){
      do
-     ::   do
-          ::   vouchersO_ch?voucher ->
-               cSO_chan!voucher;
-               break;
-          od
+     ::   vouchersO_ch?voucher ->
+          cSO_chan!voucher;
      od
 }
 
 active proctype creditBlockFlagChange(){
      do
-     ::   do
-          ::   vouchercBFC_ch?voucher ->
-               if
-               ::   cBFC_chan?true -> Cbf = true;
-               ::   cBFC_chan?false -> Cbf = false;
-               fi;
-               break;
-          od
+     ::   vouchercBFC_ch?voucher ->
+          if
+          ::   cBFC_chan?true -> Cbf = true;
+          ::   cBFC_chan?false -> Cbf = false;
+          fi;
      od
 }
 
 active proctype createSalesOrder(){
      do
-     ::   do
-          ::   cSO_chan?voucher ->
+     ::   cSO_chan?voucher ->
+          vouchernSORS_ch!voucher;
+          if
+          ::   nSORSC_ch?true ->
+               msg_ch!msg;
+          ::   nSORSC_ch?false ->
+               vouchertCC_ch!voucher
                if
-               ::   nSORSC_ch?true ->
+               ::   tCC_ch?false ->
                     msg_ch!msg;
-               ::   nSORSC_ch?false ->
-                    vouchertCC_ch!voucher
+                    cBFC_chan!true;
+                    Nsors = true;
+               ::   tCC_ch?true ->
+                    vouchercBFchk_ch!voucher
                     if
-                    ::   tCC_ch?false ->
-                         msg_ch!msg;
-                         cBFC_chan!true;
-                         Nsors = true;
-                    ::   tCC_ch?true ->
-                         vouchercBFchk_ch!voucher
-                         if
-                         ::   cBFchk_chan?true ->
-                              cBFC_chan!false;
-                         fi;
+                    ::   cBFchk_chan?true ->
+                         cBFC_chan!false;
                     fi;
                fi;
-               break;
-          od
+          fi;
      od
 }
 
@@ -129,6 +113,7 @@ active proctype main(){
      ::   vouchersO_ch!voucher;
           // printf("%c\n", cSO_chan);
      od
+     // vouchersO_ch!voucher;
 }
 
 // active proctype raiseCreditLimit(){
