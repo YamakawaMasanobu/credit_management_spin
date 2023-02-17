@@ -3,7 +3,7 @@
 mtype = {voucher, error_message, msg};
 bool Nsors = false, Cbf = false, Cs = true;
 short Creditlimit = 1000;
-short Receivabole = 0;
+short Receivable = 0;
 
 
 chan vouchertCC_ch = [0] of {mtype};
@@ -22,12 +22,15 @@ chan cBFchk_chan = [0] of {bool}
 
 active proctype temporaryCreditCheck() {
      do
-     ::   vouchertCC_ch?voucher ->
-          do
-          ::   tCC_ch!true;
-               break;
-          ::   Cs = false;
-               tCC_ch!false;
+     ::   do
+          ::   vouchertCC_ch?voucher ->
+               do
+               ::   tCC_ch!true;
+                    break;
+               ::   Cs = false;
+                    tCC_ch!false;
+                    break;
+               od
                break;
           od
      od
@@ -35,20 +38,24 @@ active proctype temporaryCreditCheck() {
 
 active proctype errorMessageDisplay(){
      do
-     ::   msg_ch?msg ->
-          msg_ch!error_message
-          break;
+     ::   do
+          ::   msg_ch?msg ->
+               msg_ch!error_message
+               break;
+          od
      od
 }
 
 active proctype newStateOrderRefusalStateCheck(){
      do
-     ::   vouchernSORS_ch?voucher ->
-          do
-          ::   nSORSC_ch!true;
-               break;
-          ::   nSORSC_ch!false;
-               break;
+     ::   do
+          ::   vouchernSORS_ch?voucher ->
+               do
+               ::   nSORSC_ch!true;
+                    break;
+               ::   nSORSC_ch!false;
+                    break;
+               od
           od
      od
 }
@@ -56,59 +63,71 @@ active proctype newStateOrderRefusalStateCheck(){
 
 active proctype creditBlockFlagCheck(){
      do
-     ::vouchercBFchk_ch?voucher ->
-          if
-          ::   cBFchk_chan!true
-          ::   cBFchk_chan!false
-          fi;
+     ::   do
+          ::vouchercBFchk_ch?voucher ->
+               if
+               ::   cBFchk_chan!true
+               ::   cBFchk_chan!false
+               fi;
+               break;
+          od
      od
 }
 
 active proctype salesOrder(){
      do
-     ::   vouchersO_ch?voucher ->
-          cSO_chan!voucher;
-          break;
+     ::   do
+          ::   vouchersO_ch?voucher ->
+               cSO_chan!voucher;
+               break;
+          od
      od
 }
 
 active proctype creditBlockFlagChange(){
      do
-     ::   vouchercBFC_ch?voucher ->
-          if
-          ::   cBFC_chan?true -> Cbf = true;
-          ::   cBFC_chan?false -> Cbf = false;
-          fi;
+     ::   do
+          ::   vouchercBFC_ch?voucher ->
+               if
+               ::   cBFC_chan?true -> Cbf = true;
+               ::   cBFC_chan?false -> Cbf = false;
+               fi;
+               break;
+          od
      od
 }
 
 active proctype createSalesOrder(){
      do
-     ::   cSO_chan?voucher ->
-          if
-          ::   nSORSC_ch?true ->
-               msg_ch!msg;
-          ::   nSORSC_ch?false ->
-               vouchertCC_ch!voucher
+     ::   do
+          ::   cSO_chan?voucher ->
                if
-               ::   tCC_ch?false ->
+               ::   nSORSC_ch?true ->
                     msg_ch!msg;
-                    cBFC_chan!true;
-                    Nsors = true;
-               ::   tCC_ch?true ->
-                    vouchercBFchk_ch!voucher
+               ::   nSORSC_ch?false ->
+                    vouchertCC_ch!voucher
                     if
-                    ::   cBFchk_chan?true ->
-                         cBFC_chan!false;
+                    ::   tCC_ch?false ->
+                         msg_ch!msg;
+                         cBFC_chan!true;
+                         Nsors = true;
+                    ::   tCC_ch?true ->
+                         vouchercBFchk_ch!voucher
+                         if
+                         ::   cBFchk_chan?true ->
+                              cBFC_chan!false;
+                         fi;
                     fi;
                fi;
-          fi;
+               break;
+          od
      od
 }
 
 active proctype main(){
      do
      ::   vouchersO_ch!voucher;
+          // printf("%c\n", cSO_chan);
      od
 }
 
