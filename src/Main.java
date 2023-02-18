@@ -49,7 +49,7 @@ public class Main {
                     System.out.println("Please enter sales amount");
                     salesOrder(voucher_sample, scan.nextDouble());
                 } else if (tmp == 2) {
-                    voucher_sample.raiseCreditLimit(scan, voucher_sample);
+                    voucher_sample.raiseCreditLimit(voucher_sample);
                 } else{
                     errorMessageDisplay("Please enter 1 or 2.");
                 }

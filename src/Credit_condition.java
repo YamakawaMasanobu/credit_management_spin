@@ -2,7 +2,6 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 public class Credit_condition {
     boolean Nsors;  //New Sales Order Refusal State(新規伝票受付拒否状態)
-//    boolean Rotcc;  //Result of Temporary Credit Check(仮の与信チェックの結果):trueならUNDER,falseならOVER
     boolean Cbf;    //Credit Block Flag(与信ブロックフラグ):trueならON,falseならOFF
     boolean Cs;     //Credit State(与信状態):trueならUNDER,falseならOVER
     double CreditLimit; //与信限度額
