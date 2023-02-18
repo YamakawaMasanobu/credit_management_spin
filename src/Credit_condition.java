@@ -55,4 +55,3 @@ public class Credit_condition {
         }
     }
 }
-//test
