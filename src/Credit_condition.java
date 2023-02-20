@@ -20,20 +20,22 @@ public class Credit_condition {
 
     public void createSalesOrder(Credit_condition voucher, double newOrderAmount){
         boolean resultNsorsChk = Main.newStateOrderRefusalStateCheck(voucher);
+        boolean resulttCC = Main.temporaryCreditCheck(newOrderAmount, voucher);
 
         if(resultNsorsChk == true){
             Main.errorMessageDisplay("You are in New sales order refusal state.");
             System.out.println("receivables = " + voucher.Receivables);
-        }else if (resultNsorsChk == false && Main.temporaryCreditCheck(newOrderAmount, voucher) == false){
+        }else if (resultNsorsChk == false && resulttCC == false){
             voucher.Receivables += newOrderAmount;
             Main.errorMessageDisplay("Over credit limit");
             System.out.println("receivables = " + voucher.Receivables);
             creditBlockFlagChange(true, voucher);
             voucher.Nsors = true;
-        }else if (resultNsorsChk == false && Main.temporaryCreditCheck(newOrderAmount, voucher) == true){
+        }else if (resultNsorsChk == false && resulttCC == true){
+            boolean resultcBFC = Main.creditBlockFlagCheck(voucher);
             voucher.Receivables += newOrderAmount;
             System.out.println("receivables = " + voucher.Receivables);
-            if(Main.creditBlockFlagCheck(voucher) == true){
+            if(resultcBFC == true){
                 creditBlockFlagChange(false, voucher);
             }
         }
