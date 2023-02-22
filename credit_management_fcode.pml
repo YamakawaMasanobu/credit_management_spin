@@ -10,7 +10,7 @@ chan vouchertCC_ch = [0] of {mtype};
 chan vouchernSORSC_ch = [0] of {mtype};
 chan vouchercBFchk_ch = [0] of {mtype};
 chan vouchersO_ch = [0] of {mtype};
-chan vouchercBFC_ch = [0] of {mtype};
+chan vouchercBFC_ch = [0] of {mtype, bool};
 chan vouchercSO_ch = [0] of {mtype};
 
 //各メソッドの返り値のためのチャネル
@@ -73,15 +73,24 @@ active proctype salesOrder(){
      od
 }
 
+// active proctype creditBlockFlagChange(){
+//      do
+//      ::   vouchercBFC_ch?voucher ->
+//           if
+//           ::   cBFC_chan?true -> Cbf = true;
+//           ::   cBFC_chan?false -> Cbf = false;
+//           fi;
+//      od
+// }
 active proctype creditBlockFlagChange(){
      do
-     ::   vouchercBFC_ch?voucher ->
-          if
-          ::   cBFC_chan?true -> Cbf = true;
-          ::   cBFC_chan?false -> Cbf = false;
-          fi;
+     ::   vouchercBFC_ch?voucher, true ->
+          Cbf = true;
+     ::   vouchercBFC_ch?voucher, false ->
+          Cbf = false;
      od
 }
+
 
 active proctype createSalesOrder(){
      do
@@ -97,13 +106,13 @@ active proctype createSalesOrder(){
                ::   tCC_ch?false ->
                     msg_ch!msg;
                     msg_ch?error_message;
-                    cBFC_chan!true;
+                    vouchercBFC_ch!voucher, true;
                     Nsors = true;
                ::   tCC_ch?true ->
                     vouchercBFchk_ch!voucher;
                     if
                     ::   cBFchk_chan?true ->
-                         cBFC_chan!false;
+                         vouchercBFC_ch!voucher, false;
                     ::   cBFchk_chan?false ->
                          skip;
                     fi;
