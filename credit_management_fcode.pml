@@ -96,12 +96,13 @@ active proctype createSalesOrder(){
      do
      ::   vouchercSO_ch?voucher ->
           vouchernSORSC_ch!voucher;
-          vouchertCC_ch!voucher;
+          // vouchertCC_ch!voucher;
           if
           ::   nSORSC_ch?true ->
                msg_ch!msg;
                msg_ch?error_message;
           ::   nSORSC_ch?false ->
+               vouchertCC_ch!voucher;
                if
                ::   tCC_ch?false ->
                     msg_ch!msg;
